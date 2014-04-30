@@ -6,3 +6,4 @@ gem 'motion-cocoapods'
 gem 'bubble-wrap'
 
 gem 'ProMotion'
+gem 'afmotion'
