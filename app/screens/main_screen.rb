@@ -5,7 +5,7 @@ class MainScreen < PM::Screen
   end
 
   def open_test
-    open TestScreen
+    open AuthScreen
   end
 
 
