@@ -4,7 +4,9 @@ class AuthScreen < PM::WebScreen
   CLIENT_ID = 'sandbox'
   REDIRECT_URI = 'http://localhost'
   SCOPE = 'https://cloud.feedly.com/subscriptions'
+  CLIENT_SECRET = '0AUDIAHZEB0ISJ1JLFWZ'
   AUTH_URI = "http://sandbox.feedly.com/v3/auth/auth?client_id=#{CLIENT_ID}&redirect_uri=#{REDIRECT_URI}&response_type=code&scope=#{SCOPE}"
+
 
   def on_init
     super
@@ -40,6 +42,22 @@ class AuthScreen < PM::WebScreen
         kv = str.split('=')
         params[kv[0]] = kv[1]
       end
+
+      url = "http://sandbox.feedly.com/v3/".nsurl
+      oauthClient = AFOAuth2Client.clientWithBaseURL(url, clientID:CLIENT_ID, secret:CLIENT_SECRET)
+
+      oauthClient.authenticateUsingOAuthWithPath("/oauth/token", scope:SCOPE,
+        success: lambda { |credential|
+          NSLog("I have a token! %@", credential.accessToken)
+          AFOAuthCredential.storeCredential(credential,withIdentifier(oauthClient.serviceProviderIdentifier))
+        },
+        failure: lambda {
+          NSLog("Error: %@", error)
+        }
+      )
+
+      p 'close!!!!!!!!'
+
       pp params
       pp request, in_type
       close screen: :auth_screen, code: params['code'] 
