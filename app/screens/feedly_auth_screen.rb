@@ -1,6 +1,6 @@
 class FeedlyAuthScreen < PM::WebScreen
 
-  title 'Feedly Auth'
+  title 'Feedly Login'
 
   SCREEN_NAME = :FeedlyAuthScreen
 
@@ -18,7 +18,10 @@ class FeedlyAuthScreen < PM::WebScreen
   end
 
   def on_load
-    set_nav_bar_button :right, system_item: :add, action: :hoge
+    # ナビゲーションバーの下にWebViewが初期表示時に重なってしまう問題の対処(iOS 7.x以降)
+    if self.respondsToSelector('edgesForExtendedLayout')
+      self.edgesForExtendedLayout = UIRectEdgeNone
+    end
 
     @activity = UIActivityIndicatorView.alloc.initWithActivityIndicatorStyle(UIActivityIndicatorViewStyleGray)
     self.view.addSubview(@activity)
