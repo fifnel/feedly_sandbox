@@ -77,6 +77,12 @@ class FeedlyAuthScreen < PM::WebScreen
   def start_request
     NXOAuth2AccountStore.sharedStore.requestAccessToAccountWithType(OAUTH2CLIENT_ACCOUNT_TYPE,
       withPreparedAuthorizationURLHandler: ->(prepared_url) {
+        # cookieを消しておかないと、ログイン済みの各種Webサービスのセッションが生きていて
+        # アカウント入力する機会が与えられないままFeedlyにログインされてしまう
+        cookie_storage = NSHTTPCookieStorage.sharedHTTPCookieStorage
+        cookie_storage.cookies.each { |cookie|
+          cookie_storage.deleteCookie(cookie)
+        }
         open_url(prepared_url)
       }
     )
