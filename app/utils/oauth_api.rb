@@ -3,10 +3,13 @@ class OAuthAPI
 
     def setup(base_url, accout_id = nil)
       @@base_url = base_url.nsurl
+      account_id ||= App::Persistence['foobar'] # TODO: foobarどうにかする
       if accout_id.nil?
-        account_id = App::Persistence['foobar'] # TODO: foobarどうにかする
+        false
+      else
+        @@account = NXOAuth2AccountStore.sharedStore.accountWithIdentifier(account_id)
+        true
       end
-      @@account = NXOAuth2AccountStore.sharedStore.accountWithIdentifier(account_id)
     end
 
     def request(api, method='GET', progress_handler=nil, &block)
