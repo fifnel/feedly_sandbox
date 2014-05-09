@@ -23,13 +23,8 @@ class FeedlyAuthScreen < PM::WebScreen
       self.edgesForExtendedLayout = UIRectEdgeNone
     end
 
-
-    set_nav_bar_button :right, title:"Close", action: :close_modal
-
-    @activity = UIActivityIndicatorView.alloc.initWithActivityIndicatorStyle(UIActivityIndicatorViewStyleGray)
-    self.view.addSubview(@activity)
-    @activity.center = self.view.center
-    @activity.hidesWhenStopped = true
+    set_nav_bar_button :left, system_item: :refresh, action: :start_request
+    set_nav_bar_button :right, system_item: :cancel, action: :close_modal
 
     NXOAuth2AccountStore.sharedStore.setClientID(OAUTH2CLIENT_CLIENTID, 
       secret: OAUTH2CLIENT_CLIENTSECRET,
@@ -59,15 +54,15 @@ class FeedlyAuthScreen < PM::WebScreen
   end
 
   def load_started
-    @activity.startAnimating
+    BW::NetworkIndicator.show
   end
 
   def load_finished
-    @activity.stopAnimating
+    BW::NetworkIndicator.hide
   end
 
   def load_failed(error)
-    @activity.stopAnimating
+    BW::NetworkIndicator.hide
   end
 
   def on_request(request, type)

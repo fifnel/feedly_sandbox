@@ -4,6 +4,11 @@ class MainScreen < PM::TableScreen
     set_nav_bar_button :right, title:"Test", action: :open_test
 
     set_nav_bar_button :left, title:"API", action: :api_test
+
+    @indicator ||= add UIActivityIndicatorView.gray, {
+      center: [view.frame.size.width / 2, view.frame.size.height / 2 - 42]
+    }
+    @indicator.startAnimating
   end
 
   def open_test
@@ -30,8 +35,7 @@ class MainScreen < PM::TableScreen
   end
 
   def table_data
-    # @table_data ||= []
-    @table_data = [{
+    @table_data ||= [{
       cells: [
         {
           title: 'foobar',
@@ -48,24 +52,16 @@ class MainScreen < PM::TableScreen
       if args[:result] == :succeeded
         identifier = args[:identifier]
         App::Persistence['foobar'] = identifier
-        account = NXOAuth2AccountStore.sharedStore.accountWithIdentifier(identifier)
+        unless OAuthAPI.setup("https://sandbox.feedly.com", identifier)
+          p 'oauth setup failure'
+          return
+        end
 
-        # API Access Test
-        targetUrl = 'https://sandbox.feedly.com/v3/subscriptions'.nsurl
-        NXOAuth2Request.performMethod('GET',
-          onResource: targetUrl,
-          usingParameters: nil,
-          withAccount: account,
-          sendProgressHandler: ->(bytesSend, bytesTotal) {
-            pp bytesSend
-            pp bytesTotal
-          },
-          responseHandler: ->(response, responseData, error) {
-            pp response
-            pp responseData
-            pp error
-          }
-        )
+        OAuthAPI.request('/v3/subscriptions') do |response, responseData, error|
+          pp response
+          pp responseData
+          pp error
+        end
       else
       end
     end
