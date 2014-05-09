@@ -23,6 +23,9 @@ class FeedlyAuthScreen < PM::WebScreen
       self.edgesForExtendedLayout = UIRectEdgeNone
     end
 
+
+    set_nav_bar_button :right, title:"Close", action: :close_modal
+
     @activity = UIActivityIndicatorView.alloc.initWithActivityIndicatorStyle(UIActivityIndicatorViewStyleGray)
     self.view.addSubview(@activity)
     @activity.center = self.view.center
@@ -91,4 +94,8 @@ class FeedlyAuthScreen < PM::WebScreen
     )
   end
 
+  def close_modal
+    close
+  end
+    
 end
