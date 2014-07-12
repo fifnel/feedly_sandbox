@@ -2,7 +2,7 @@ class AppDelegate < PM::Delegate
 
   def on_load(app, options)
 
-    FeedlyOAuth.instance.initial_setup
+    FeedlyOAuth.instance # call initialize method
     
     open SettingsScreen.new(nav_bar: true) # for debug
     # open MainScreen.new(nav_bar: true)

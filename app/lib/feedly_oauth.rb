@@ -1,28 +1,10 @@
-module SingletonClass
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
-
-  module ClassMethods
-    def new
-      super
-      instance
-    end
-
-    def instance
-      Dispatch.once { @instance ||= alloc.init }
-      @instance
-    end
-  end
-end
-
 class FeedlyOAuth
   include SingletonClass
 
   attr_accessor :account_type, :client_id, :client_secret
   attr_accessor :redirect_url, :base_url, :auth_url, :token_url, :scope_url
 
-  def initial_setup
+  def initialize
     self.account_type   = "Feedlysandbox"
     self.client_id      = "sandbox"
     self.client_secret  = "ES3R6KCEG46BW9MYD332"
@@ -42,34 +24,41 @@ class FeedlyOAuth
 
     @oauth2_succeed_observer ||= App.notification_center.observe(NXOAuth2AccountStoreAccountsDidChangeNotification) { |notification|
       account =  notification.userInfo[NXOAuth2AccountStoreNewAccountUserInfoKey]
-      setup_account(account.identifier)
+      self.account_identifier = account.identifier
     }
 
     @oauth2_failure_observer ||= App.notification_center.observe(NXOAuth2AccountStoreDidFailToRequestAccessNotification) { |notification|
     }
 
-    setup_account
+    load
   end
 
-  def finalize
+  def dealloc
     App.notification_center.unobserve @oauth2_succeed_observer
     App.notification_center.unobserve @oauth2_failure_observer
   end
 
-  def setup_account(account_identifier = nil)
-    if account_identifier
-      App::Persistence['account_identifier'] = account_identifier
+  def account_identifier=(account_identifier)
+    PM::logger.info('hogehogehoge')
+    if account_identifier.nil?
+      @account = nil
     else
-      account_identifier ||= App::Persistence['account_identifier']
+      @account = NXOAuth2AccountStore.sharedStore.accountWithIdentifier(account_identifier)
     end
-
-    @account = NXOAuth2AccountStore.sharedStore.accountWithIdentifier(account_identifier)
-    PM::logger.info("account identifier:#{account_identifier}")
+    @account_identifier = account_identifier
+    PM::logger.info("account identifier:#{@account_identifier}")
   end
 
-  def relese_account
-    App::Persistence.delete('account_identifier')
-    @account = nil
+  def save
+    if @account_identifier.nil?
+      App::Persistence.delete('account_identifier')
+    else
+      App::Persistence['account_identifier'] = @account_identifier
+    end
+  end
+
+  def load
+    self.account_identifier = App::Persistence['account_identifier']
   end
 
   def authorized?
@@ -77,6 +66,8 @@ class FeedlyOAuth
   end
 
   def request(api, method='GET', progress_handler=nil, &block)
+    PM::logger.info("account identifier:#{@account_identifier}")
+    PM::logger.info("account identifier:#{@account}")
     target_url = (self.base_url.nsurl.absoluteString + api).nsurl
     PM::logger.info(target_url)
 
