@@ -7,4 +7,5 @@ gem 'bubble-wrap'
 gem 'sugarcube', :require => 'sugarcube-common'
 gem 'motion-pp'
 
-gem 'ProMotion'
+# gem 'ProMotion'
+gem "ProMotion", "~> 2.0.rc1"
