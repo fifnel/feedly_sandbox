@@ -14,6 +14,8 @@ Motion::Project::App.setup do |app|
 
   app.frameworks += ['Security']
 
+  app.files_dependencies 'app/screens/feedly_auth_screen.rb' => 'app/lib/feedly_oauth.rb'
+
   app.pods do
     pod 'NXOAuth2Client', :git => 'https://github.com/takuran/OAuth2Client.git'  
   end

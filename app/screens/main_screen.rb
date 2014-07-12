@@ -1,6 +1,7 @@
 class MainScreen < PM::TableScreen
 
   def on_load
+
     set_nav_bar_button :right, title:"Test", action: :open_test
 
     set_nav_bar_button :left, title:"API", action: :api_test
@@ -11,6 +12,12 @@ class MainScreen < PM::TableScreen
     @indicator.startAnimating
   end
 
+  def on_appear
+    unless OAuth.authorized?
+      FeedlyAuthScreen.open_modal(self)
+    end
+  end
+
   def open_test
     # open AuthScreen
     # open FeedlyAuthScreen
@@ -18,16 +25,16 @@ class MainScreen < PM::TableScreen
   end
 
   def api_test
-    unless OAuthAPI.setup("https://sandbox.feedly.com")
-      p 'oauth setup failure'
-      return
-    end
+    # unless OAuth.setup("https://sandbox.feedly.com")
+    #   p 'oauth setup failure'
+    #   return
+    # end
 
-    OAuthAPI.request('/v3/subscriptions') do |response, responseData, error|
-      pp response
-      pp responseData
-      pp error
-    end
+    # OAuth.request('/v3/subscriptions') do |response, responseData, error|
+    #   pp response
+    #   pp responseData
+    #   pp error
+    # end
   end
 
   def open_dummy
@@ -47,24 +54,17 @@ class MainScreen < PM::TableScreen
   end
 
   def on_return(args)
-    case args[:screen]
-    when FeedlyAuthScreen::SCREEN_NAME
-      if args[:result] == :succeeded
-        identifier = args[:identifier]
-        App::Persistence['foobar'] = identifier
-        unless OAuthAPI.setup("https://sandbox.feedly.com", identifier)
-          p 'oauth setup failure'
-          return
-        end
-
-        OAuthAPI.request('/v3/subscriptions') do |response, responseData, error|
-          pp response
-          pp responseData
-          pp error
-        end
-      else
-      end
-    end
+    # case args[:screen]
+    # when FeedlyAuthScreen::SCREEN_NAME
+    #   if args[:result] == :succeeded
+    #     OAuth.request('/v3/subscriptions') do |response, responseData, error|
+    #       pp response
+    #       pp responseData
+    #       pp error
+    #     end
+    #   else
+    #   end
+    # end
   end
 
 end
