@@ -32,10 +32,10 @@ class CategoriesScreen < PM::TableScreen
         @categories = res
         update_table_data
       end
+      self.navigationItem.rightBarButtonItem.enabled = true
       PM.logger.debug "response:#{response}"
       PM.logger.debug "responseData:#{responseData}"
       PM.logger.debug "error:#{error}"
-      self.navigationItem.rightBarButtonItem.enabled = true
     end
   end
 

@@ -1,40 +1,56 @@
-class FeedScreen < PM::TableScreen
+class FeedScreen < PM::GroupedTableScreen
 
   attr_accessor :id
 
   title 'FeedDetail'
 
-  def table_data
-    []
-    # @feeds ||= []
-    # [{
-    #   cells: @feeds.map do |item|
-    #     {
-    #       title: item['title'],
-    #       action: :detail_feed,
-    #       arguments: { id: item['id']}
+  @feed = nil
 
-    #     }
-    #     end
-    # }]
+  def table_data
+    if @feed.nil?
+      []
+    else
+      [
+        {
+          title: 'title',
+          cells: [{ title: @feed['title'] }]
+        },{
+          title: 'velocity',
+          cells: [{ title: @feed['velocity'].to_s }]
+        },{
+          title: 'subscribers',
+          cells: [{ title: @feed['subscribers'].to_s }]
+        },{
+          title: 'language',
+          cells: [{ title: @feed['language'] }]
+        },{
+          title: 'website',
+          cells: [{ title: @feed['website'] }]
+        },{
+          title: 'description',
+          cells: [{ title: @feed['description'] }]
+        }
+      ]
+    end
   end
 
   def on_load
     set_nav_bar_button :right, system_item: :refresh, action: :refresh
     refresh
-    pp self.id.escape_url
   end
 
   def refresh
     self.navigationItem.rightBarButtonItem.enabled = false
     FeedlyOAuth.instance.request("/v3/feeds/#{self.id.escape_url}") do |response, responseData, error|
-      res = BW::JSON.parse(responseData)
+      unless error
+        @feed = BW::JSON.parse(responseData)
+        update_table_data
+      end
+      self.navigationItem.rightBarButtonItem.enabled = true
       PM.logger.debug "response:#{response}"
       PM.logger.debug "responseData:#{responseData}"
       PM.logger.debug "error:#{error}"
-      self.navigationItem.rightBarButtonItem.enabled = true
     end
   end
 
 end
-
