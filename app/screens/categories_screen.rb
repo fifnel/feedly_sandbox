@@ -9,7 +9,7 @@ class CategoriesScreen < PM::TableScreen
         {
           title: item['label'],
           action: :detail_category,
-          arguments: { id: item['id'] }
+          arguments: { id: item['id'], title: item['label'] }
         }
         end
     }]
@@ -21,7 +21,7 @@ class CategoriesScreen < PM::TableScreen
   end
 
   def detail_category(args={})
-    open FeedsScreen.new(nav_bar: true, id:args[:id])
+    open FeedsScreen.new(nav_bar: true, title:args[:title], id:args[:id])
   end
 
   def refresh

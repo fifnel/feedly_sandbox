@@ -35,12 +35,14 @@ class FeedsScreen < PM::TableScreen
       res = BW::JSON.parse(responseData)
       unless error
         @feeds = res.find_all do |item|
+          is_found = false
           item['categories'].each do |category|
             if self.id == category['id']
-              break true
+              is_found = true
+              break
             end
-            false
           end
+          is_found
         end
         update_table_data
       end
