@@ -21,7 +21,7 @@ class CategoriesScreen < PM::TableScreen
   end
 
   def detail_category(args={})
-    pp args
+    open FeedsScreen.new(nav_bar: true, id:args[:id])
   end
 
   def refresh

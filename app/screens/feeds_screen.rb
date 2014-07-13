@@ -21,6 +21,12 @@ class FeedsScreen < PM::TableScreen
   def on_load
     set_nav_bar_button :right, system_item: :refresh, action: :refresh
     refresh
+    p 'hoge'
+    pp self.id
+  end
+
+  def detail_feed(args={})
+    open FeedScreen.new(nav_bar: true, id:args[:id])
   end
 
   def refresh
@@ -30,7 +36,7 @@ class FeedsScreen < PM::TableScreen
       unless error
         @feeds = res.find_all do |item|
           item['categories'].each do |category|
-            if id == @id
+            if self.id == category['id']
               break true
             end
             false
